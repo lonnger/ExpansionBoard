@@ -1,0 +1,9 @@
+
+
+# ignoring the annoying macOS folder layout file
+**/.DS_Store
+# ignoring .swp files
+*.swp
+
+.vscode
+.history/
