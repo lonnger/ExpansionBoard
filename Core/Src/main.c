@@ -99,7 +99,7 @@ int main(void)
   MX_I2C2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  extern void =startRTOS(void);
+  extern void startRTOS(void);
   startRTOS();
   /* USER CODE END 2 */
 

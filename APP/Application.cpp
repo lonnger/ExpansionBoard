@@ -190,6 +190,7 @@ void CANinit()
     configASSERT(HAL_CAN_Start(&hcan) == HAL_OK);
     configASSERT(HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) == HAL_OK);
 }
+
 ADS1115::ADS1115_Config_t ads1115Config = {
     .channel         = ADS1115::MultiplexerConfig_t::CHANNEL_AIN0_GND,
     .pgaConfig       = ADS1115::PGA_Config_t::PGA_6_144,
@@ -212,8 +213,9 @@ static StackType_t i2cTaskStack[128];
 static StaticTask_t i2cTaskTCB;
 void i2cTask(void *param)
 {
-    ads1115.ADS1115_setConversionReadyPin();
-    ads1115.ADS1115_startContinousMode();
+    //AIN0_GND电压差测电流，AIN3_GND电压差测激光测距仪（绑扎位置/换轨位置），AIN2_GND，AIN1_GND备用
+    ads1115.ADS1115_setConversionReadyPin(); //设置电压报警阈值
+    ads1115.ADS1115_startContinousMode();  //连续转换模式，持续更新转换结果寄存器的值
     ads1115Config.channel = ADS1115::MultiplexerConfig_t::CHANNEL_AIN2_GND;
     ads1115.ADS1115_updateConfig(ads1115Config);
     while (1)

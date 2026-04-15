@@ -133,4 +133,24 @@ C_INCLUDES =  \
 
 include Rules.mk
 
-# *** EOF ***
+#######################################
+# J-Link Flash Section
+#######################################
+# 定义芯片型号和接口
+#######################################
+# J-Link Flash Section
+#######################################
+JLINK_DEVICE = STM32F103C8
+JLINK_IF = SWD
+JLINK_SPEED = 4000
+
+flash: $(BUILD_DIR)/$(TARGET).elf
+	@echo r > flash.jlink
+	@echo h >> flash.jlink
+	@echo loadfile $(BUILD_DIR)/$(TARGET).elf >> flash.jlink
+	@echo r >> flash.jlink
+	@echo g >> flash.jlink
+	@echo q >> flash.jlink
+	JLink.exe -device $(JLINK_DEVICE) -if $(JLINK_IF) -speed $(JLINK_SPEED) -autoconnect 1 -CommandFile flash.jlink
+# 修改这里：增加 -f 强制删除且不报错，兼容性更好
+	-rm -f flash.jlink
