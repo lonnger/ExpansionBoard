@@ -144,10 +144,10 @@ JLINK_DEVICE = STM32F103C8
 JLINK_IF = SWD
 JLINK_SPEED = 4000
 
-flash: $(BUILD_DIR)/$(TARGET).elf
+flash: $(BUILD_DIR)/$(TARGET).hex
 	@echo r > flash.jlink
 	@echo h >> flash.jlink
-	@echo loadfile $(BUILD_DIR)/$(TARGET).elf >> flash.jlink
+	@echo loadfile $(BUILD_DIR)/$(TARGET).hex >> flash.jlink
 	@echo r >> flash.jlink
 	@echo g >> flash.jlink
 	@echo q >> flash.jlink

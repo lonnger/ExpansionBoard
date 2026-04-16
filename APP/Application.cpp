@@ -264,6 +264,18 @@ void mainTask(void *param)
 
     CANinit();
 
+    // 应对急停按下电源重新上电：发送紧急信号，主控板收到后机器停止
+    uint8_t Emergency_Signal = 1; 
+    TxData[2] = Emergency_Signal & 0xFF;
+    for(uint8_t i = 0; i < 3; i++){
+        
+        HAL_CAN_AddTxMessage(&hcan, &FrontTxHeader, TxData, &TxMailbox);
+        vTaskDelay(10);
+
+    }
+    Emergency_Signal = 0; 
+    TxData[2] = Emergency_Signal & 0xFF;
+
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
@@ -294,7 +306,8 @@ void mainTask(void *param)
         //        PA15 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15);
 
         bumperSensor = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12);                // 防撞条没用
-        bFaultPin    = HAL_GPIO_ReadPin(B_nFAULT_GPIO_Port, B_nFAULT_Pin);  // 横移电机故障引脚
+        bFaultPin    = HAL_GPIO_ReadPin(B_nFAULT_GPIO_Port, B_nFAULT_Pin);  
+        bFaultPin = 0;     // 横移电机故障引脚
        /* 
         if(adcData[1] < 1080){//600-1800
             adcData[1] = 13153;  // 机器在地面，节点传感器信号值会干扰自动模式机器前后方向
