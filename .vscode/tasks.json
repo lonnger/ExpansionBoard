@@ -1,0 +1,38 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "STM32: Build Debug",
+            "type": "shell",
+            "command": "D:/Program Files/Git/bin/bash.exe",
+            "args": [
+                "-lc",
+                "make -B MAKE=make OPT=-Og GCC_PATH=/e/HKCRC/compile_tools/gcc-arm-none-eabi/bin all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Rebuild with -Og and DWARF 4 for breakpoints and source-level stepping"
+        },
+        {
+            "label": "STM32: Clean",
+            "type": "shell",
+            "command": "D:/Program Files/Git/bin/bash.exe",
+            "args": [
+                "-lc",
+                "make MAKE=make clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

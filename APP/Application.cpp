@@ -253,6 +253,13 @@ static StaticTask_t mainTaskTCB;
 // volatile uint8_t PB3;
 // volatile uint8_t PA15;
 //char *buf = "Hello UART!\r\n";
+static void sendPB1State(void)
+{
+    uint8_t message[] = "PB1: 0\r\n";
+    message[5] = (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) ? '1' : '0';
+    HAL_UART_Transmit(&huart1, message, sizeof(message) - 1, HAL_MAX_DELAY);
+}
+
 void mainTask(void *param)
 {
 
@@ -269,7 +276,8 @@ void mainTask(void *param)
     TxData[2] = Emergency_Signal & 0xFF;
     for(uint8_t i = 0; i < 3; i++){
         
-        HAL_CAN_AddTxMessage(&hcan, &FrontTxHeader, TxData, &TxMailbox);
+        HAL_CAN_AddTxMessage(&hcan, &FrontTxHeader, TxData, &TxMailbox);//只发了前板的急停
+        HAL_CAN_AddTxMessage(&hcan, &BackTxHeader, TxData, &TxMailbox);
         vTaskDelay(10);
 
     }
@@ -287,10 +295,10 @@ void mainTask(void *param)
         //HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), HAL_MAX_DELAY);
         // PVT2光耦
         photoCouplers = 0;
-        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6) << 6;  // 升降电机磁感（RM2006电机） PA6 触发高电平，到底部触发
-        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) << 7;  // 条形激光，PB0 遇到钢筋时触发高电平（距离近触发）
-        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) << 2;  // 横移磁感 后（左）PB1 触发高电平  前（左）PB2 触发高电平
-        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) << 3;  // 横移磁感 后（右）PB2 触发高电平  前（右）PB1 触发高电平
+        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6) << 6;  // 
+        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) << 7;  // 
+        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) << 2;  // 条形激光
+        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) << 3;  // 
         //        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);   //
         //        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4);   //
         //        photoCouplers = photoCouplers | HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);   //
@@ -306,7 +314,7 @@ void mainTask(void *param)
         //        PA15 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15);
 
         bumperSensor = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12);                // 防撞条没用
-        bFaultPin    = HAL_GPIO_ReadPin(B_nFAULT_GPIO_Port, B_nFAULT_Pin);  
+        bFaultPin    = HAL_GPIO_ReadPin(B_nFAULT_GPIO_Port, B_nFAULT_Pin);   //PB12
         bFaultPin = 0;     // 横移电机故障引脚
        /* 
         if(adcData[1] < 1080){//600-1800
@@ -317,7 +325,7 @@ void mainTask(void *param)
         TxData[1] = adcData[1] & 0xFF;
 
 
-        printf("TxData[0]: %d, TxData[1]: %d\r\n", TxData[0], TxData[1]);
+       // printf("TxData[4]: %d, TxData[5]: %d\r\n", TxData[4], TxData[5]);
 
         TxData[2] = bFaultPin >> 8;
         TxData[3] = bFaultPin & 0xFF;
@@ -327,6 +335,8 @@ void mainTask(void *param)
 
         TxData[6] = photoCouplers;
         TxData[7] = BMotorState << 2 | AMotorState;
+
+        sendPB1State();
 
         if (boardPosition == BoardPosition::Front)
         {

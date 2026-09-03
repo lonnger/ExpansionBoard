@@ -33,7 +33,11 @@
 # Text editor configuration
 .idea/
 .cache/
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json
 .history/
 .settings/
 *.sublime-workspace
